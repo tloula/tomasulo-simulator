@@ -1,0 +1,28 @@
+Begin Assembly
+ADDI R1, R0, 1
+ADDI R2, R0, 2
+ADDI R3, R0, 3
+ADDI R4, R0, 4
+ADDI R5, R0, 5
+ADDI R6, R0, 6
+ADDI R7, R0, 7
+ADDI R8, R0, 8
+ADD R9, R1, R2
+HALT
+End Assembly
+Begin Data 4000 44
+10
+0
+23
+71
+33
+5
+93
+82
+34
+13
+111
+23
+End Data
+Begin Data 5000 100
+End Data
