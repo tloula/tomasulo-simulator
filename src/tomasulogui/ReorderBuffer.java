@@ -4,12 +4,26 @@ public class ReorderBuffer {
   public static final int size = 30;
   int frontQ = 0;
   int rearQ = 0;
+
+  // TREV: Array index serves as tag
   ROBEntry[] buff = new ROBEntry[size];
   int numRetirees = 0;
 
   PipelineSimulator simulator;
   RegisterFile regs;
   boolean halted = false;
+
+  public int getFrontQ(){
+    return this.frontQ;
+  }
+
+  public int getRearQ(){
+    return this.rearQ;
+  }
+
+  public int getSize() {
+    return size;
+  }
 
   public ReorderBuffer(PipelineSimulator sim, RegisterFile registers) {
     simulator = sim;
@@ -36,6 +50,10 @@ public class ReorderBuffer {
     return numRetirees;
   }
 
+  public RegisterFile getRegs(){
+    return regs;
+  }
+
   public boolean retireInst() {
     // 3 cases
     // 1. regular reg dest inst
@@ -53,16 +71,22 @@ public class ReorderBuffer {
     }
 
     boolean shouldAdvance = true;
-
+    ROBEntry inst = buff[frontQ];
     // TODO - this is where you look at the type of instruction and
     // figure out how to retire it properly
+    if (!inst.isComplete()) {
+      shouldAdvance = false; 
+    }
+    else {
+      if(inst.getWriteReg() != -1) regs.setReg(inst.getWriteReg(), inst.getWriteValue());
+    }
 
-      // if mispredict branch, won't do normal advance
-      if (shouldAdvance) {
-        numRetirees++;
-        buff[frontQ] = null;
-        frontQ = (frontQ + 1) % size;
-      }
+    // if mispredict branch, won't do normal advance
+    if (shouldAdvance) {
+      numRetirees++;
+      buff[frontQ] = null;
+      frontQ = (frontQ + 1) % size;
+    }
 
     return false;
   }

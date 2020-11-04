@@ -38,7 +38,6 @@ public class ROBEntry {
     return opcode;
   }
 
-
   public boolean isHaltOpcode() {
     return (opcode == IssuedInst.INST_TYPE.HALT);
   }
@@ -59,15 +58,56 @@ public class ROBEntry {
     writeValue = value;
   }
 
-  public void copyInstData(IssuedInst inst, int frontQ) {
-    instPC = inst.getPC();
-    inst.setRegDestTag(frontQ);
+  public void copyInstData(IssuedInst inst, int rearQ) {
 
     // TODO - This is a long and complicated method, probably the most complex
     // of the project.  It does 2 things:
-    // 1. update the instruction, as shown in 2nd line of code above
-    // 2. update the fields of the ROBEntry, as shown in the 1st line of code above
+    // 1. update the instruction
+    // 2. update the fields of the ROBEntry
 
+    if (inst.getRegDestUsed()) 
+      inst.setRegDestTag(rearQ);
+    
+    if (inst.getRegSrc1Used()) {
+      // Loop through ROB
+      int i = rearQ;
+      while (i != rob.getFrontQ()) {
+        if (this.rob.getEntryByTag(i).getWriteReg() == inst.getRegSrc1()) {
+          if(this.rob.getEntryByTag(i).isComplete()){
+            inst.setRegSrc1Value(this.rob.getEntryByTag(i).getWriteValue());
+            inst.setRegSrc1Valid();
+          } else {
+            inst.setRegSrc1Tag(i);
+          }
+        } else {
+          inst.setRegSrc1Value(rob.getRegs().getReg(inst.getRegSrc1()));
+        }
+        i = (i == 0) ? rob.getSize() - 1 : i--;
+      }
+    }
+    if (inst.getRegSrc2Used()) {
+      // Loop through ROB
+      int i = rearQ;
+      while (i != rob.getFrontQ()) {
+        if (this.rob.getEntryByTag(i).getWriteReg() == inst.getRegSrc2()) {
+          if(this.rob.getEntryByTag(i).isComplete()){
+            inst.setRegSrc2Value(this.rob.getEntryByTag(i).getWriteValue());
+            inst.setRegSrc2Valid();
+          } else {
+            inst.setRegSrc2Tag(i);
+          }
+        } else {
+          inst.setRegSrc2Value(rob.getRegs().getReg(inst.getRegSrc2()));
+        }
+        i = (i == 0) ? rob.getSize() - 1 : i--;
+      }
+    }
+
+    // Fill in branch prediction
+
+
+    // Update ROB entry fields. 
+    this.writeReg = inst.getRegDest();
+    this.instPC = inst.getPC();
   }
-
 }

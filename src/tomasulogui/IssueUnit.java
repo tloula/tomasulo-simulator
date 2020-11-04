@@ -21,7 +21,8 @@ public class IssueUnit {
       } else {
         // Get instruction from memory
         issue = IssuedInst.createIssuedInst(this.simulator.getMemory().getInstAtAddr(this.simulator.getPC()));
-        
+        issue.setPC(this.simulator.getPC());
+
         // Issue it to the proper FU based on the type IFF it has an available slot
 
         IssuedInst.INST_TYPE opcode = issue.getOpcode();
@@ -66,6 +67,7 @@ public class IssueUnit {
           this.instType = EXEC_TYPE.ALU; 
         }
       }
+
       // 2. issuing to reservation station, if no structural hazard
       // to issue, we make an IssuedInst, filling in what we know
       // We check the BTB, and put prediction if branch, updating PC

@@ -382,6 +382,18 @@ public class PipelineSimulator {
       cdb.squashAll();
     }
 
+    private boolean setCDBData(FunctionalUnit fu) {
+      if (fu.getActivity() == FunctionalUnit.state.RAISING_HAND) {
+        cdb.setDataTag(fu.getResultTag());
+        cdb.setDataValue(fu.getResult());
+        cdb.setDataValid(true);
+
+        fu.setStateCDB();
+        return true;
+      }
+      return false;
+    }
+
     public void updateCDB() {
       // here, we need to poll the functional units and see if they want to
       // writeback.  We pick longest running of those who want to use CDB and
@@ -389,7 +401,11 @@ public class PipelineSimulator {
       cdb.setDataValid(false);
 
       // hint: start with divider, and give it first chance of getting CDB
-
+      if (!setCDBData(this.divider)) {
+        if (!setCDBData(this.multiplier)) {
+          setCDBData(this.alu);
+        }
+      }
     }
 
     public static void main(String[] args) {

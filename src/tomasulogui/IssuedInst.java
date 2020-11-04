@@ -42,12 +42,24 @@ public class IssuedInst {
       return regSrc1;
     }
 
+    public boolean getRegSrc1Used() {
+      return this.regSrc1Used;
+    }
+
     public int getRegSrc2() {
       return regSrc2;
     }
 
+    public boolean getRegSrc2Used() {
+      return this.regSrc2Used;
+    }
+
     public int getRegDest() {
       return regDest;
+    }
+
+    public boolean getRegDestUsed() {
+      return this.regDestUsed;
     }
 
     public int getRegDestTag() {

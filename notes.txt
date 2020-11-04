@@ -1,0 +1,10 @@
+Questions for G:
+
+Why does the Figure 3.29 not have things like ALU unit or Branch unit?
+Why do all of the FUs have only 2 reservation stations?
+
+// When adding in branching, need to add to these files/functions:
+    reorderBuffer.java: retireInst 
+    issueUnit.java: execCycle
+    functionUnit.java: acceptIssue
+    robEntry.java: copyInstData
