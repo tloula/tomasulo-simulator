@@ -92,23 +92,23 @@ public class PipelineSimulator {
       pc.setPC(newPC);
     }
 
-    public Object getALU() {
+    public IntAlu getALU() {
       return alu;
     }
 
-    public Object getMult() {
+    public IntMult getMult() {
       return multiplier;
     }
 
-    public Object getDivider() {
+    public IntDivide getDivider() {
       return divider;
     }
 
-    public Object getBranchUnit() {
+    public BranchUnit getBranchUnit() {
       return branchUnit;
     }
 
-    public Object getLoader() {
+    public LoadBuffer getLoader() {
       return loader;
     }
 

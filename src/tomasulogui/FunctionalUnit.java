@@ -18,6 +18,13 @@ public abstract class FunctionalUnit {
 
   public abstract int getExecCycles();
 
+  public boolean isFull(){
+    if(stations[0] != null && stations[1] != null){
+      return true; 
+    }
+    else return false;
+  }
+
   public void execCycle(CDB cdb) {
     //todo - start executing, ask for CDB, etc.
   }
