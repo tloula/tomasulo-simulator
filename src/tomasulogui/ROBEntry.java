@@ -22,6 +22,10 @@ public class ROBEntry {
     return complete;
   }
 
+  public void setComplete() {
+    this.complete = true;
+  }
+
   public boolean branchMispredicted() {
     return mispredicted;
   }
@@ -79,10 +83,12 @@ public class ROBEntry {
           } else {
             inst.setRegSrc1Tag(i);
           }
-        } else {
-          inst.setRegSrc1Value(rob.getRegs().getReg(inst.getRegSrc1()));
         }
-        i = (i == 0) ? rob.getSize() - 1 : i--;
+        i = (i == 0) ? rob.getSize() - 1 : --i;
+      }
+      if (inst.getRegSrc1Tag() == -1 && !inst.getRegSrc1Valid()){
+          inst.setRegSrc1Value(rob.getRegs().getReg(inst.getRegSrc1()));
+          inst.setRegSrc1Valid();
       }
     }
     if (inst.getRegSrc2Used()) {
@@ -96,10 +102,12 @@ public class ROBEntry {
           } else {
             inst.setRegSrc2Tag(i);
           }
-        } else {
-          inst.setRegSrc2Value(rob.getRegs().getReg(inst.getRegSrc2()));
         }
-        i = (i == 0) ? rob.getSize() - 1 : i--;
+        i = (i == 0) ? rob.getSize() - 1 : --i;
+      }
+      if (inst.getRegSrc2Tag() == -1 && !inst.getRegSrc2Valid()){
+        inst.setRegSrc2Value(rob.getRegs().getReg(inst.getRegSrc2()));
+        inst.setRegSrc2Valid();
       }
     }
 
@@ -109,5 +117,6 @@ public class ROBEntry {
     // Update ROB entry fields. 
     this.writeReg = inst.getRegDest();
     this.instPC = inst.getPC();
+    this.opcode = inst.getOpcode();
   }
 }

@@ -35,6 +35,14 @@ public class ReservationStation {
     return data2;
   }
 
+  public boolean getData1Valid() {
+    return data1Valid;
+  }
+
+  public boolean getData2Valid() {
+    return data2Valid;
+  }
+
   public boolean isPredictedTaken() {
     return predictedTaken;
   }
@@ -45,6 +53,7 @@ public class ReservationStation {
 
   public void snoop(CDB cdb) {
     // TODO - add code to snoop on CDB each cycle
+
   }
 
   public boolean isReady() {

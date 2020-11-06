@@ -71,14 +71,14 @@ public class ReorderBuffer {
     }
 
     boolean shouldAdvance = true;
-    ROBEntry inst = buff[frontQ];
+
     // TODO - this is where you look at the type of instruction and
     // figure out how to retire it properly
-    if (!inst.isComplete()) {
+    if (!retiree.isComplete()) {
       shouldAdvance = false; 
     }
     else {
-      if(inst.getWriteReg() != -1) regs.setReg(inst.getWriteReg(), inst.getWriteValue());
+      if(retiree.getWriteReg() != -1) regs.setReg(retiree.getWriteReg(), retiree.getWriteValue());
     }
 
     // if mispredict branch, won't do normal advance
@@ -87,6 +87,8 @@ public class ReorderBuffer {
       buff[frontQ] = null;
       frontQ = (frontQ + 1) % size;
     }
+    
+    readCDB(simulator.getCDB());
 
     return false;
   }
@@ -97,6 +99,10 @@ public class ReorderBuffer {
     // could be store address source
 
     // TODO body of method
+    if (cdb.getDataTag() != -1 && cdb.getDataValid()) {
+      simulator.getROB().getEntryByTag(cdb.getDataTag()).setWriteValue(cdb.getDataValue());
+      simulator.getROB().getEntryByTag(cdb.getDataTag()).setComplete();
+    }
   }
 
   public void updateInstForIssue(IssuedInst inst) {

@@ -5,7 +5,7 @@ public class IssueUnit {
     NONE, LOAD, ALU, MULT, DIV, BRANCH} ;
 
     PipelineSimulator simulator;
-    IssuedInst issue;
+    IssuedInst issuee;
     EXEC_TYPE instType;
     Object fu;
 
@@ -20,12 +20,12 @@ public class IssueUnit {
         return;
       } else {
         // Get instruction from memory
-        issue = IssuedInst.createIssuedInst(this.simulator.getMemory().getInstAtAddr(this.simulator.getPC()));
-        issue.setPC(this.simulator.getPC());
+        issuee = IssuedInst.createIssuedInst(this.simulator.getMemory().getInstAtAddr(this.simulator.getPC()));
+        issuee.setPC(this.simulator.getPC());
 
         // Issue it to the proper FU based on the type IFF it has an available slot
 
-        IssuedInst.INST_TYPE opcode = issue.getOpcode();
+        IssuedInst.INST_TYPE opcode = issuee.getOpcode();
 
         if (opcode == IssuedInst.INST_TYPE.DIV) {
           if(this.simulator.getDivider().isFull()){
@@ -81,31 +81,33 @@ public class IssueUnit {
       this.simulator.setPC(this.simulator.getPC() + 4);
 
       // We then send this to the ROB, which fills in the data fields
-      this.simulator.getROB().updateInstForIssue(issue);
+      this.simulator.getROB().updateInstForIssue(issuee);
 
       // We then check the CDB, and see if it is broadcasting data we need,
       //    so that we can forward during issue
       if (this.simulator.getCDB().getDataValid()){
-        if (this.simulator.getCDB().getDataTag() == issue.getRegSrc1Tag()) {
-          issue.setRegSrc1Valid();
-          issue.setRegSrc1Value(this.simulator.getCDB().getDataValue());
-        } else if (this.simulator.getCDB().getDataTag() == issue.getRegSrc2Tag()){
-          issue.setRegSrc2Valid();
-          issue.setRegSrc2Value(this.simulator.getCDB().getDataValue());
+        if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc1Tag()) {
+          issuee.setRegSrc1Valid();
+          issuee.setRegSrc1Value(this.simulator.getCDB().getDataValue());
+        } else if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc2Tag()){
+          issuee.setRegSrc2Valid();
+          issuee.setRegSrc2Value(this.simulator.getCDB().getDataValue());
         }
       }
 
       // We then send this to the FU, who stores in reservation station
       if (instType == EXEC_TYPE.ALU){
-        this.simulator.getALU().acceptIssue(issue);
+        this.simulator.getALU().acceptIssue(issuee);
       } else if (instType == EXEC_TYPE.BRANCH){
-        this.simulator.getBranchUnit().acceptIssue(issue);        
+        this.simulator.getBranchUnit().acceptIssue(issuee);
       } else if (instType == EXEC_TYPE.MULT){
-        this.simulator.getMult().acceptIssue(issue);        
+        this.simulator.getMult().acceptIssue(issuee);
       } else if (instType == EXEC_TYPE.DIV){
-        this.simulator.getDivider().acceptIssue(issue);  
+        this.simulator.getDivider().acceptIssue(issuee);
       } else if (instType == EXEC_TYPE.NONE){
-        // TODO: What about wack instructions like NOP and HALT? 
+        // TODO: What about wack instructions like NOP and HALT?
+      } else if (instType == EXEC_TYPE.LOAD) {
+        this.simulator.getLoader().acceptIssue(issuee);
       } else {
         System.out.println("How did you...what? ....How did you get here?");
       }

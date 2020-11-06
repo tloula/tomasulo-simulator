@@ -290,14 +290,14 @@ public class PipelineSimulator {
     }
 
     public void step() {
+      updateCDB();
+
       isHalted = reorder.retireInst();
 
       if (!isHalted) {
         if (!quietMode) {
           System.out.println("fetching instruction from address " + pc.getPC());
         }
-
-        updateCDB();
 
         divider.execCycle(cdb);
         multiplier.execCycle(cdb);
@@ -382,7 +382,7 @@ public class PipelineSimulator {
       cdb.squashAll();
     }
 
-    private boolean setCDBData(FunctionalUnit fu) {
+    private boolean poll(FunctionalUnit fu) {
       if (fu.getActivity() == FunctionalUnit.state.RAISING_HAND) {
         cdb.setDataTag(fu.getResultTag());
         cdb.setDataValue(fu.getResult());
@@ -401,9 +401,9 @@ public class PipelineSimulator {
       cdb.setDataValid(false);
 
       // hint: start with divider, and give it first chance of getting CDB
-      if (!setCDBData(this.divider)) {
-        if (!setCDBData(this.multiplier)) {
-          setCDBData(this.alu);
+      if (!poll(this.divider)) {
+        if (!poll(this.multiplier)) {
+          poll(this.alu);
         }
       }
     }
