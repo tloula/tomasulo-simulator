@@ -74,11 +74,28 @@ public class ReorderBuffer {
 
     // TODO - this is where you look at the type of instruction and
     // figure out how to retire it properly
+
     if (!retiree.isComplete()) {
       shouldAdvance = false; 
     }
     else {
-      if(retiree.getWriteReg() != -1) regs.setReg(retiree.getWriteReg(), retiree.getWriteValue());
+      // if is branch 
+        // if (mispredicted Branch)
+          // Handle mispredicted branch
+        // else
+          // Handle correctly predicted branch (do nothing?) 
+          
+      // else if is store
+      if (retiree.getOpcode() == IssuedInst.INST_TYPE.STORE) {
+        // Set memory
+        // SW R1, 0(R2)
+        int address = retiree.getWriteReg();
+        simulator.getMemory().setIntDataAtAddr(address, retiree.getWriteValue());
+      } 
+      // else if is alu/mul/div/nop/load, I think?
+      else { 
+        if(retiree.getWriteReg() != -1) regs.setReg(retiree.getWriteReg(), retiree.getWriteValue());
+      }
     }
 
     // if mispredict branch, won't do normal advance

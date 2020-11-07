@@ -47,6 +47,9 @@ public abstract class FunctionalUnit {
   public void execCycle(CDB cdb) {
     //todo - start executing, ask for CDB, etc.
 
+    if (stations[0] != null) stations[0].snoop(cdb);
+    if (stations[1] != null) stations[1].snoop(cdb);
+
     // if an instruction got put on the cdb, set the res station to null
     if (activity == state.CDB){
       activity = state.INACTIVE;
@@ -98,6 +101,9 @@ public abstract class FunctionalUnit {
       case ANDI:
       case ORI:
       case XORI:
+      case SLL:
+      case SRA:
+      case SRL:
         this.stations[slot].data2 = inst.getImmediate();
         this.stations[slot].data2Valid = true;
         break;

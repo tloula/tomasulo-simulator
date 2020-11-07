@@ -9,8 +9,7 @@ public class IntDivide extends FunctionalUnit {
     }
 
     public int calculateResult(int station) {
-        int result = 0;
-        return result;
+        return this.stations[station].getData1() / this.stations[station].getData2();
     }
 
     public int getExecCycles() {

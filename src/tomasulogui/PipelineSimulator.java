@@ -290,8 +290,8 @@ public class PipelineSimulator {
     }
 
     public void step() {
-      updateCDB();
 
+      updateCDB();
       isHalted = reorder.retireInst();
 
       if (!isHalted) {
@@ -401,10 +401,16 @@ public class PipelineSimulator {
       cdb.setDataValid(false);
 
       // hint: start with divider, and give it first chance of getting CDB
-      if (!poll(this.divider)) {
-        if (!poll(this.multiplier)) {
-          poll(this.alu);
-        }
+      if (poll(this.divider)) return;
+      if (poll(this.multiplier)) return;
+      if (poll(this.alu)) return;
+
+      // Poll Load Unit
+      if (loader.isRequestingWriteback()) {
+        cdb.setDataTag(loader.getWriteTag());
+        cdb.setDataValue(loader.getWriteData());
+        cdb.setDataValid(true);
+        loader.setCanWriteback();
       }
     }
 

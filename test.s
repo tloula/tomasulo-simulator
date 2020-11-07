@@ -1,21 +1,22 @@
 Begin Assembly
-ADDI R1, R0, 1
-ADDI R2, R0, 2
-ADDI R3, R0, 3
+ADDI R1, R0, 35
+ADDI R2, R0, 7
+DIV R3, R1, R2
+ADD R10, R3, R1
 ADDI R4, R0, 4
 ADDI R5, R0, 5
 ADDI R6, R0, 6
 ADDI R7, R0, 7
 ADDI R8, R0, 8
-ADD R9, R1, R2
+ADDI R9, R0, 9
 HALT
 End Assembly
 Begin Data 4000 44
-10
-0
+4008
+75
 23
 71
-33
+32
 5
 93
 82

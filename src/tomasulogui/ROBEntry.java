@@ -68,23 +68,27 @@ public class ROBEntry {
     // of the project.  It does 2 things:
     // 1. update the instruction
     // 2. update the fields of the ROBEntry
+    int frontQ = rob.getFrontQ();
 
     if (inst.getRegDestUsed()) 
       inst.setRegDestTag(rearQ);
-    
+
     if (inst.getRegSrc1Used()) {
       // Loop through ROB
       int i = rearQ;
-      while (i != rob.getFrontQ()) {
-        if (this.rob.getEntryByTag(i).getWriteReg() == inst.getRegSrc1()) {
-          if(this.rob.getEntryByTag(i).isComplete()){
-            inst.setRegSrc1Value(this.rob.getEntryByTag(i).getWriteValue());
-            inst.setRegSrc1Valid();
-          } else {
+      if(rearQ != frontQ){
+        do {
+          i = (i == 0) ? rob.getSize() - 1 : --i;
+
+          if (this.rob.getEntryByTag(i).getWriteReg() == inst.getRegSrc1()) {
+            if(this.rob.getEntryByTag(i).isComplete()){
+              inst.setRegSrc1Value(this.rob.getEntryByTag(i).getWriteValue());
+              inst.setRegSrc1Valid();
+            } 
             inst.setRegSrc1Tag(i);
+            break;
           }
-        }
-        i = (i == 0) ? rob.getSize() - 1 : --i;
+        } while (i != frontQ);
       }
       if (inst.getRegSrc1Tag() == -1 && !inst.getRegSrc1Valid()){
           inst.setRegSrc1Value(rob.getRegs().getReg(inst.getRegSrc1()));
@@ -94,17 +98,21 @@ public class ROBEntry {
     if (inst.getRegSrc2Used()) {
       // Loop through ROB
       int i = rearQ;
-      while (i != rob.getFrontQ()) {
-        if (this.rob.getEntryByTag(i).getWriteReg() == inst.getRegSrc2()) {
-          if(this.rob.getEntryByTag(i).isComplete()){
-            inst.setRegSrc2Value(this.rob.getEntryByTag(i).getWriteValue());
-            inst.setRegSrc2Valid();
-          } else {
+      if (rearQ != frontQ) {
+        do {
+          i = (i == 0) ? rob.getSize() - 1 : --i;
+
+          if (this.rob.getEntryByTag(i).getWriteReg() == inst.getRegSrc2()) {
+            if(this.rob.getEntryByTag(i).isComplete()){
+              inst.setRegSrc2Value(this.rob.getEntryByTag(i).getWriteValue());
+              inst.setRegSrc2Valid();
+            }
             inst.setRegSrc2Tag(i);
+            break;
           }
-        }
-        i = (i == 0) ? rob.getSize() - 1 : --i;
+        } while (i != frontQ);
       }
+
       if (inst.getRegSrc2Tag() == -1 && !inst.getRegSrc2Valid()){
         inst.setRegSrc2Value(rob.getRegs().getReg(inst.getRegSrc2()));
         inst.setRegSrc2Valid();
