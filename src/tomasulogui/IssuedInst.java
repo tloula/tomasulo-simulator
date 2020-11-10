@@ -261,7 +261,8 @@ public class IssuedInst {
           opcode == INST_TYPE.ANDI ||
           opcode == INST_TYPE.ORI ||
           opcode == INST_TYPE.XORI ||
-          opcode == INST_TYPE.LOAD) {
+          opcode == INST_TYPE.LOAD ||
+          opcode == INST_TYPE.STORE) {
         regDestUsed = true;
         regDest = inst.getRT();
         regSrc1Used = true;

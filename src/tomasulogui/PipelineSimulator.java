@@ -16,7 +16,7 @@ public class PipelineSimulator {
     IssueUnit issue;
     BranchPredictor btb;
     ReorderBuffer reorder;
-    RegisterFile regs;
+    RegisterFile regs; 
     CDB cdb;
     LoadBuffer loader;
     IntAlu alu;
@@ -403,7 +403,6 @@ public class PipelineSimulator {
       // hint: start with divider, and give it first chance of getting CDB
       if (poll(this.divider)) return;
       if (poll(this.multiplier)) return;
-      if (poll(this.alu)) return;
 
       // Poll Load Unit
       if (loader.isRequestingWriteback()) {
@@ -411,7 +410,10 @@ public class PipelineSimulator {
         cdb.setDataValue(loader.getWriteData());
         cdb.setDataValid(true);
         loader.setCanWriteback();
+        return;
       }
+
+      if (poll(this.alu)) return;
     }
 
     public static void main(String[] args) {

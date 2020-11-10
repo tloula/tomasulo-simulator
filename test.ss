@@ -1,7 +1,7 @@
-0:  ADDI R1, R0, 35
-4:  ADDI R2, R0, 7
-8:  DIV R3, R1, R2
-12:  ADD R10, R3, R1
+0:  ADDI R1, R0, 4000
+4:  LW R2, 0(R1)
+8:  SW R2, 4(R1)
+12:  ADDI R3, R0, 3
 16:  ADDI R4, R0, 4
 20:  ADDI R5, R0, 5
 24:  ADDI R6, R0, 6

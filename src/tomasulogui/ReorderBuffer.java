@@ -83,14 +83,12 @@ public class ReorderBuffer {
         // if (mispredicted Branch)
           // Handle mispredicted branch
         // else
-          // Handle correctly predicted branch (do nothing?) 
+          // Handle correctly predicted branch (do nothing?)
           
       // else if is store
       if (retiree.getOpcode() == IssuedInst.INST_TYPE.STORE) {
         // Set memory
-        // SW R1, 0(R2)
-        int address = retiree.getWriteReg();
-        simulator.getMemory().setIntDataAtAddr(address, retiree.getWriteValue());
+        simulator.getMemory().setIntDataAtAddr(retiree.getWriteValue(), simulator.regs.getReg(retiree.getWriteReg()));
       } 
       // else if is alu/mul/div/nop/load, I think?
       else { 

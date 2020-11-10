@@ -1,5 +1,7 @@
 package tomasulogui;
 
+import tomasulogui.IssuedInst.INST_TYPE;
+
 public class ROBEntry {
   ReorderBuffer rob;
 
@@ -70,7 +72,7 @@ public class ROBEntry {
     // 2. update the fields of the ROBEntry
     int frontQ = rob.getFrontQ();
 
-    if (inst.getRegDestUsed()) 
+    if (inst.getRegDestUsed() || inst.getOpcode() == INST_TYPE.STORE)
       inst.setRegDestTag(rearQ);
 
     if (inst.getRegSrc1Used()) {

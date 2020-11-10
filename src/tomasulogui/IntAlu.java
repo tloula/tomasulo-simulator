@@ -18,6 +18,7 @@ public class IntAlu extends FunctionalUnit{
     switch (inst) {
       case ADD:
       case ADDI:
+      case STORE:
         result = leftOperand + rightOperand;
         break;
       case SUB:
@@ -48,7 +49,7 @@ public class IntAlu extends FunctionalUnit{
         System.out.println("Int ALU got an invalid instruction, instruction is: " + inst);
         break;
     }
-    
+
     return result;
   }
 

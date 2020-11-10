@@ -104,6 +104,7 @@ public abstract class FunctionalUnit {
       case SLL:
       case SRA:
       case SRL:
+      case STORE:
         this.stations[slot].data2 = inst.getImmediate();
         this.stations[slot].data2Valid = true;
         break;

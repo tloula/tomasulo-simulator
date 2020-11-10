@@ -1,17 +1,21 @@
 Questions for G:
 
-I moved updateCDB from line 301 to line 293 of PipelineSimulator.java 
-because I thought it emulated the hardware better. Is that OK?
+Why are there registers in both the pipeline simulator and the reorder buffer???
 
 ----------------------------------------------------------------------
 
 // When adding in branching, need to add to these files/functions:
     reorderBuffer.java: retireInst 
     issueUnit.java: execCycle
-    functionUnit.java: acceptIssue
+    functionalUnit.java: acceptIssue
+    functionalUnit.java: squash
     robEntry.java: copyInstData
 
-    reservationStation.java: snoop
+
 
 
 Do we handle the num of retirees correctly?
+
+Writeup: --------------------------------------------------------------
+
+We prioritized LOAD ops over ALU ops to prevent LOADs from starving.
