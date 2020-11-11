@@ -73,13 +73,6 @@ public class IssueUnit {
       // We check the BTB, and put prediction if branch, updating PC
       //     if pred taken, incr PC otherwise
 
-      // TODO: Finish
-      // Update PC
-      //Handle branches
-      //else
-      //Increment normallly
-      this.simulator.setPC(this.simulator.getPC() + 4);
-
       // We then send this to the ROB, which fills in the data fields
       this.simulator.getROB().updateInstForIssue(issuee);
 

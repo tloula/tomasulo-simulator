@@ -23,23 +23,24 @@ public class BranchPredictor {
 
     int pcOffset = issued.getPC() / 4;
 
-    boolean prediction = false;
+    boolean predictTaken = false;
+
+    if(issued.isBranch()){
+      return;
+    }
 
     if (issued.getOpcode() == IssuedInst.INST_TYPE.J ||
         issued.getOpcode() == IssuedInst.INST_TYPE.JR ||
         issued.getOpcode() == IssuedInst.INST_TYPE.JAL ||
         issued.getOpcode() == IssuedInst.INST_TYPE.JALR) {
-      prediction = true;
+      predictTaken = true;
     }
     else {
-      if (counters[pcOffset] > 1 && tgt[pcOffset] != 1) {
-        prediction = true;
-      }
-      else {
-        prediction = false;
+      if (counters[pcOffset] > 1 && tgt[pcOffset] != -1) { // Changed tgt[pcOffset] comparison to -1 (from 1)
+        predictTaken = true;
       }
     }
-    issued.setBranchPrediction(prediction);
+    issued.setBranchPrediction(predictTaken);
 
     int tgtAddress = -1;
 
@@ -66,12 +67,8 @@ public class BranchPredictor {
 
     issued.setBranchTgt(tgtAddress);
 
-    if (prediction) {
-      simulator.setPC(tgtAddress);
-    }
-    else {
-      simulator.setPC(issued.getPC() + 4);
-    }
+    int newPC = predictTaken ? tgtAddress : issued.getPC() + 4;
+    simulator.setPC(newPC);
   }
 
   public void setBranchAddress(int pc, int addr) {

@@ -1,5 +1,7 @@
 package tomasulogui;
 
+import tomasulogui.IssuedInst.INST_TYPE;
+
 public class ReorderBuffer {
   public static final int size = 30;
   int frontQ = 0;
@@ -23,6 +25,10 @@ public class ReorderBuffer {
 
   public int getSize() {
     return size;
+  }
+
+  public PipelineSimulator getSimulator(){
+    return simulator;
   }
 
   public ReorderBuffer(PipelineSimulator sim, RegisterFile registers) {
@@ -71,6 +77,7 @@ public class ReorderBuffer {
     }
 
     boolean shouldAdvance = true;
+    boolean squashed = false;
 
     // TODO - this is where you look at the type of instruction and
     // figure out how to retire it properly
@@ -79,12 +86,28 @@ public class ReorderBuffer {
       shouldAdvance = false; 
     }
     else {
-      // if is branch 
-        // if (mispredicted Branch)
-          // Handle mispredicted branch
-        // else
-          // Handle correctly predicted branch (do nothing?)
-          
+      // If is branch
+      if(retiree.isBranch()){
+        if(retiree.branchMispredicted()){
+          // Handle mispredicted branch (update pc, squash?)
+          int newPC = retiree.getPredictTaken() ? retiree.getInstPC() + 4 : retiree.getTarget();
+          this.simulator.setPC(newPC);
+          this.simulator.getALU().squashAll();
+          squashed = true;
+        }
+        if ( retiree.getOpcode() == INST_TYPE.JAL ||
+                  retiree.getOpcode() ==INST_TYPE.JALR){
+          regs.setReg(31, retiree.getInstPC());
+        }
+        if (  retiree.getOpcode() == INST_TYPE.JR ||
+              retiree.getOpcode() ==INST_TYPE.JALR) {
+          this.simulator.setPC(retiree.getWriteValue() + 4);
+          this.simulator.getALU().squashAll();
+          squashed = true;
+        }
+
+        this.simulator.getBTB().setBranchResult(retiree.getInstPC(), retiree.getPredictTaken() ^ retiree.branchMispredicted());
+      }
       // else if is store
       if (retiree.getOpcode() == IssuedInst.INST_TYPE.STORE) {
         // Set memory
@@ -94,15 +117,27 @@ public class ReorderBuffer {
       else { 
         if(retiree.getWriteReg() != -1) regs.setReg(retiree.getWriteReg(), retiree.getWriteValue());
       }
-    }
 
-    // if mispredict branch, won't do normal advance
-    if (shouldAdvance) {
-      numRetirees++;
-      buff[frontQ] = null;
-      frontQ = (frontQ + 1) % size;
+      // if mispredict branch, won't do normal advance
+      if (shouldAdvance) {
+        numRetirees++;
+        buff[frontQ] = null;
+        frontQ = (frontQ + 1) % size;
+      }
+
+      if (squashed){
+        frontQ = 0;
+        rearQ = 0;
+  
+        // Null out everything else so it looks nicer
+        for(int i = 0; i < 30; i++){
+          buff[i] = null;
+        }
+        return false; // Might not need this eventually, for now, it avoids the readCDB line
+      }
     }
     
+    // Can we move this?
     readCDB(simulator.getCDB());
 
     return false;
@@ -113,8 +148,7 @@ public class ReorderBuffer {
     // could be destination reg
     // could be store address source
 
-    // TODO body of method
-    if (cdb.getDataTag() != -1 && cdb.getDataValid()) {
+    if (cdb.getDataValid()) {
       simulator.getROB().getEntryByTag(cdb.getDataTag()).setWriteValue(cdb.getDataValue());
       simulator.getROB().getEntryByTag(cdb.getDataTag()).setComplete();
     }

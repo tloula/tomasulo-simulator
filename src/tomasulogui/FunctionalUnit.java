@@ -13,8 +13,20 @@ public abstract class FunctionalUnit {
     simulator = sim;
   }
  
+  public void squash() {
+    stations[0] = null;
+    stations[1] = null;
+    activity = state.INACTIVE;
+    timeLeft = -1;
+  }
   public void squashAll() {
-    // todo fill in
+    // Grab all units
+    this.simulator.getALU().squash();
+    this.simulator.getBranchUnit().squash();
+    this.simulator.getDivider().squash();
+    this.simulator.getMult().squash();
+    this.simulator.getLoader().squashAll();
+    this.simulator.getCDB().squashAll();
   }
 
   public abstract int calculateResult(int station);
@@ -85,7 +97,7 @@ public abstract class FunctionalUnit {
     if (timeLeft == 0) {
       timeLeft = -1;
       this.result = this.calculateResult(currentSlot);
-      this.activity = state.RAISING_HAND;
+      this.activity = this instanceof BranchUnit ?  state.INACTIVE : state.RAISING_HAND;
     }
   }
 
@@ -95,6 +107,13 @@ public abstract class FunctionalUnit {
     int slot = (stations[currentSlot] == null) ? currentSlot : (currentSlot + 1) % 2;
 
     this.stations[slot] = new ReservationStation(simulator);
+
+    this.stations[slot].tag1 = inst.getRegSrc1Tag();
+    this.stations[slot].tag2 = inst.getRegSrc2Tag();
+    this.stations[slot].data1 = inst.getRegSrc1Value();
+    this.stations[slot].data1Valid = inst.getRegSrc1Valid();
+    this.stations[slot].destTag = inst.getRegDestTag();
+    this.stations[slot].function = inst.getOpcode();
 
     switch (inst.getOpcode()) {
       case ADDI:
@@ -114,13 +133,11 @@ public abstract class FunctionalUnit {
         break;
     }
 
-    this.stations[slot].tag1 = inst.getRegSrc1Tag();
-    this.stations[slot].tag2 = inst.getRegSrc2Tag();
-    this.stations[slot].data1 = inst.getRegSrc1Value();
-    this.stations[slot].data1Valid = inst.getRegSrc1Valid();
-    this.stations[slot].destTag = inst.getRegDestTag();
-    this.stations[slot].function = inst.getOpcode();
-
     // Branch stuff
+    this.stations[slot].address = inst.getBranchTgt();
+    this.stations[slot].predictedTaken = inst.getBranchPrediction();
+    // Set later??
+    // int addressTag;
+    // boolean addressValid = false; 
   }
 }

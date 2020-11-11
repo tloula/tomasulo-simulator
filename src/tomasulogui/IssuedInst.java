@@ -28,7 +28,7 @@ public class IssuedInst {
     int immediate = -1;
 
     boolean branch = false;
-    boolean branchPrediction = false;
+    boolean branchPredictTaken = false;
     int branchTgt = -1;
 
     public IssuedInst() {
@@ -83,11 +83,11 @@ public class IssuedInst {
     }
 
     public boolean getBranchPrediction() {
-      return branchPrediction;
+      return branchPredictTaken;
     }
 
     public void setBranchPrediction(boolean predict) {
-      branchPrediction = predict;
+      branchPredictTaken = predict;
     }
 
     public int getBranchTgt() {

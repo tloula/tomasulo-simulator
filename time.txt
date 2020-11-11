@@ -3,7 +3,9 @@
 11/4: 6:00 PM - 7:00 PM: 1.00 Hour
 11/5: 6:00 PM - 9:00 PM: 3.00 Hours
 11/6: 12:30 PM - 3:00 PM: 2.5 Hours
-11/6: 7:45 PM - 9:15 PM 1.5 Hours
-11/7: 2:45 PM - 
+11/6: 7:45 PM - 9:15 PM: 1.5 Hours
+11/7: 2:45 PM - 5:00 PM: 2.25 Hours
+11/7: 6:00 PM - 8:45 PM: 2.75 Hours
+11/8: 3:00 PM - 
 
-Total: 14.25 Hours
+Total: 19.25 Hours

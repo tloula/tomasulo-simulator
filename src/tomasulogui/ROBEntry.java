@@ -13,6 +13,7 @@ public class ROBEntry {
   int instPC = -1;
   int writeReg = -1;
   int writeValue = -1;
+  int target;
 
   IssuedInst.INST_TYPE opcode;
 
@@ -44,12 +45,16 @@ public class ROBEntry {
     return opcode;
   }
 
+  public int getTarget() {
+    return target;
+  }
+
   public boolean isHaltOpcode() {
     return (opcode == IssuedInst.INST_TYPE.HALT);
   }
 
-  public void setBranchTaken(boolean result) {
-  // TODO - maybe more than simple set
+  public void setBranchTaken(boolean taken) {
+    this.mispredicted = this.predictTaken ^ taken;
   }
 
   public int getWriteReg() {
@@ -64,6 +69,21 @@ public class ROBEntry {
     writeValue = value;
   }
 
+  public boolean isBranch() {
+    return (
+      this.opcode == IssuedInst.INST_TYPE.BEQ ||
+      this.opcode == IssuedInst.INST_TYPE.BGEZ ||
+      this.opcode == IssuedInst.INST_TYPE.BGTZ ||
+      this.opcode == IssuedInst.INST_TYPE.BLEZ ||
+      this.opcode == IssuedInst.INST_TYPE.BLTZ ||
+      this.opcode == IssuedInst.INST_TYPE.BNE ||
+      this.opcode == IssuedInst.INST_TYPE.J ||
+      this.opcode == IssuedInst.INST_TYPE.JR ||
+      this.opcode == IssuedInst.INST_TYPE.JAL ||
+      this.opcode == IssuedInst.INST_TYPE.JALR
+    );
+  }
+
   public void copyInstData(IssuedInst inst, int rearQ) {
 
     // TODO - This is a long and complicated method, probably the most complex
@@ -72,8 +92,7 @@ public class ROBEntry {
     // 2. update the fields of the ROBEntry
     int frontQ = rob.getFrontQ();
 
-    if (inst.getRegDestUsed() || inst.getOpcode() == INST_TYPE.STORE)
-      inst.setRegDestTag(rearQ);
+    inst.setRegDestTag(rearQ);
 
     if (inst.getRegSrc1Used()) {
       // Loop through ROB
@@ -96,7 +115,10 @@ public class ROBEntry {
           inst.setRegSrc1Value(rob.getRegs().getReg(inst.getRegSrc1()));
           inst.setRegSrc1Valid();
       }
+    } else {
+      inst.setRegSrc1Valid();
     }
+
     if (inst.getRegSrc2Used()) {
       // Loop through ROB
       int i = rearQ;
@@ -119,10 +141,13 @@ public class ROBEntry {
         inst.setRegSrc2Value(rob.getRegs().getReg(inst.getRegSrc2()));
         inst.setRegSrc2Valid();
       }
+    } else {
+      inst.setRegSrc2Valid();
     }
 
     // Fill in branch prediction
-
+    this.rob.getSimulator().getBTB().predictBranch(inst);
+    this.target = inst.getBranchTgt();
 
     // Update ROB entry fields. 
     this.writeReg = inst.getRegDest();

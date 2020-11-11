@@ -1,17 +1,10 @@
-Questions for G:
+Questions for G: ------------------------------------------------------
 
 Why are there registers in both the pipeline simulator and the reorder buffer???
 
-----------------------------------------------------------------------
+TODO: -----------------------------------------------------------------
 
-// When adding in branching, need to add to these files/functions:
-    reorderBuffer.java: retireInst 
-    issueUnit.java: execCycle
-    functionalUnit.java: acceptIssue
-    functionalUnit.java: squash
-    robEntry.java: copyInstData
-
-
+When adding in branching, need to add to these files/functions:
 
 
 Do we handle the num of retirees correctly?
