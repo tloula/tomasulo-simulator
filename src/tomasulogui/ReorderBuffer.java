@@ -7,7 +7,6 @@ public class ReorderBuffer {
   int frontQ = 0;
   int rearQ = 0;
 
-  // TREV: Array index serves as tag
   ROBEntry[] buff = new ROBEntry[size];
   int numRetirees = 0;
 
@@ -75,6 +74,11 @@ public class ReorderBuffer {
       halted = true;
       return true;
     }
+    
+    if (retiree.getOpcode() == INST_TYPE.STORE ||
+        retiree.getOpcode() == INST_TYPE.NOP) {
+      retiree.setComplete();
+    }
 
     boolean shouldAdvance = true;
     boolean squashed = false;
@@ -95,8 +99,8 @@ public class ReorderBuffer {
           this.simulator.getALU().squashAll();
           squashed = true;
         }
-        if ( retiree.getOpcode() == INST_TYPE.JAL ||
-                  retiree.getOpcode() ==INST_TYPE.JALR){
+        if (  retiree.getOpcode() == INST_TYPE.JAL ||
+              retiree.getOpcode() ==INST_TYPE.JALR){
           regs.setReg(31, retiree.getInstPC());
         }
         if (  retiree.getOpcode() == INST_TYPE.JR ||
@@ -107,11 +111,13 @@ public class ReorderBuffer {
         }
 
         this.simulator.getBTB().setBranchResult(retiree.getInstPC(), retiree.getPredictTaken() ^ retiree.branchMispredicted());
+        //this.simulator.getBTB().setBranchAddress(retiree.getInstPC(), simulator.getPC());
       }
       // else if is store
       if (retiree.getOpcode() == IssuedInst.INST_TYPE.STORE) {
-        // Set memory
-        simulator.getMemory().setIntDataAtAddr(retiree.getWriteValue(), simulator.regs.getReg(retiree.getWriteReg()));
+        if(retiree.getStoreDataTag() == 31)
+          retiree.setStoreData(simulator.getROB().getDataForReg(31));
+        simulator.getMemory().setIntDataAtAddr(retiree.getStoreAddress() + retiree.getOffset(), retiree.getStoreData());
       } 
       // else if is alu/mul/div/nop/load, I think?
       else { 
@@ -149,6 +155,18 @@ public class ReorderBuffer {
     // could be store address source
 
     if (cdb.getDataValid()) {
+      int i = rearQ;
+      do {
+        i = (i == 0) ? size - 1 : --i;
+
+        if (buff[i].getOpcode() == INST_TYPE.STORE) {
+          if (buff[i].getStoreDataTag() == cdb.getDataTag())
+            buff[i].setStoreData(cdb.getDataValue());
+          if (buff[i].getStoreAddressTag() == cdb.getDataTag())
+            buff[i].setStoreAddress(cdb.getDataValue());
+        }
+      } while (i != frontQ);
+
       simulator.getROB().getEntryByTag(cdb.getDataTag()).setWriteValue(cdb.getDataValue());
       simulator.getROB().getEntryByTag(cdb.getDataTag()).setComplete();
     }

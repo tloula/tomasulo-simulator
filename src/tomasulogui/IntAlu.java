@@ -18,7 +18,6 @@ public class IntAlu extends FunctionalUnit{
     switch (inst) {
       case ADD:
       case ADDI:
-      case STORE:
         result = leftOperand + rightOperand;
         break;
       case SUB:

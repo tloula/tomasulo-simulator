@@ -1,16 +1,27 @@
-0:  ADDI R10, R0, 9
-LABEL LOOP
-4:  ADDI R1, R1, 1
-8:  ADDI R2, R2, 2
-12:  ADDI R3, R3, 3
-16:  BEQ R3, R10, END
-20:  ADDI R4, R4, 4
-24:  ADDI R5, R5, 5
-28:  JAL LOOP
-32:  ADDI R6, R0, 6
-36:  ADDI R7, R0, 7
-LABEL END
-40:  JR R31
-44:  ADDI R8, R0, 8
-48:  ADDI R9, R0, 9
-52:  HALT
+0:  ADDI R1, R0, 4000
+4:  ADDI R2, R0, 5
+8:  SW R2, 0(R1)
+12:  SW R2, 4(R1)
+16:  SW R1, 8(R1)
+20:  HALT
+      --
+      --
+      --
+      --
+      --
+      --ADDI R10, R0, 9
+      --LABEL LOOP
+      --ADDI R1, R1, 1
+      --ADDI R2, R2, 2
+      --ADDI R3, R3, 3
+      --BEQ R3, R10, END
+      --ADDI R4, R4, 4
+      --ADDI R5, R5, 5
+      --JAL LOOP
+      --ADDI R6, R0, 6
+      --ADDI R7, R0, 7
+      --LABEL END
+      --JR R31
+      --ADDI R8, R0, 8
+      --ADDI R9, R0, 9
+      --HALT

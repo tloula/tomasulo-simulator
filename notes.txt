@@ -4,7 +4,7 @@ Why are there registers in both the pipeline simulator and the reorder buffer???
 
 TODO: -----------------------------------------------------------------
 
-When adding in branching, need to add to these files/functions:
+fix the whole 2 different "isBranch()" functions thing
 
 
 Do we handle the num of retirees correctly?

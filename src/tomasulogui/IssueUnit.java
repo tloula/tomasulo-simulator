@@ -58,7 +58,8 @@ public class IssueUnit {
           }
           this.instType = EXEC_TYPE.BRANCH; 
         } else if ( opcode == IssuedInst.INST_TYPE.NOP ||
-                    opcode == IssuedInst.INST_TYPE.HALT) {
+                    opcode == IssuedInst.INST_TYPE.HALT || 
+                    opcode == IssuedInst.INST_TYPE.STORE) {
           this.instType = EXEC_TYPE.NONE;
         } else { // ALU OPS           
           if(this.simulator.getALU().isFull()){
@@ -78,15 +79,18 @@ public class IssueUnit {
 
       // We then check the CDB, and see if it is broadcasting data we need,
       //    so that we can forward during issue
-      if (this.simulator.getCDB().getDataValid()){
-        if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc1Tag()) {
-          issuee.setRegSrc1Valid();
-          issuee.setRegSrc1Value(this.simulator.getCDB().getDataValue());
-        } else if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc2Tag()){
-          issuee.setRegSrc2Valid();
-          issuee.setRegSrc2Value(this.simulator.getCDB().getDataValue());
-        }
-      }
+
+      // TODO: If we move the CDB back, this will be necessary again
+      // Also, we will need to check CDB for Store values, not just register values
+      // if (this.simulator.getCDB().getDataValid()){
+      //   if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc1Tag()) {
+      //     issuee.setRegSrc1Valid();
+      //     issuee.setRegSrc1Value(this.simulator.getCDB().getDataValue());
+      //   } else if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc2Tag()){
+      //     issuee.setRegSrc2Valid();
+      //     issuee.setRegSrc2Value(this.simulator.getCDB().getDataValue());
+      //   }
+      // }
 
       // We then send this to the FU, who stores in reservation station
       if (instType == EXEC_TYPE.ALU){

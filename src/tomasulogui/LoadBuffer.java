@@ -42,11 +42,16 @@ public class LoadBuffer {
     loadExecuting = false;
     writebackEntry = -1;
     requestWriteback = false;
+    canWriteback = false;
   }
 
   public void execCycle(CDB cdb) {
     // first check if a reservation station was freed by writeback
+    
+
     if (canWriteback) {
+      //if(writebackEntry == -1) return; // I.e. previous instruction was squashed
+        
       buff[writebackEntry] = null;
       writebackEntry = -1;
       requestWriteback = false;
