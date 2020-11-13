@@ -15,47 +15,28 @@ public class BranchPredictor {
   }
 
   public void predictBranch(IssuedInst issued) {
-    // called knowing this is a control flow inst, but could be called on J
-    // our responsibility is to:
-    //  1.  perform prediction
-    //  2.  annotate the instruction with prediction and tgtAddress
-    //  3.  update PC if taken to tgtAddress
-
     int pcOffset = issued.getPC() / 4;
-
     boolean predictTaken = false;
+    int tgtAddress = -1;
 
+    // We obviously don't want to predict on non branch instructions
     if(!issued.determineIfBranch()){
       simulator.setPC(issued.getPC() + 4);
       return;
     }
 
+    // Conditions where we predict taken
     if (issued.getOpcode() == IssuedInst.INST_TYPE.J ||
-        issued.getOpcode() == IssuedInst.INST_TYPE.JAL) {
+        issued.getOpcode() == IssuedInst.INST_TYPE.JAL)
       predictTaken = true;
-    }
-    else {
-      if (counters[pcOffset] > 1) { // Changed tgt[pcOffset] comparison to -1 (from 1)
-        predictTaken = true;
-      }
-    }
+    else if (counters[pcOffset] > 1)
+      predictTaken = true;
+
     issued.setBranchPrediction(predictTaken);
-    // if(predictTaken){
-    //   issued.setBranch();
-    // }
-    int tgtAddress = -1;
 
-    // now tgt
-    if (issued.getOpcode() == IssuedInst.INST_TYPE.JR ||
-        issued.getOpcode() == IssuedInst.INST_TYPE.JALR) {
-      tgtAddress = issued.getPC() + 4;
-    }
-    else {
-      tgtAddress = issued.getPC() + 4 + issued.getImmediate();
-    }
-
+    // Calculate and set target and PC
+    tgtAddress = issued.getPC() + 4 + issued.getImmediate();
     issued.setBranchTgt(tgtAddress);
-
     int newPC = predictTaken ? tgtAddress : issued.getPC() + 4;
     simulator.setPC(newPC);
   }
@@ -68,20 +49,11 @@ public class BranchPredictor {
     int counter = counters[pc / 4];
 
     if (taken) {
-      if ( (counter == 1) || (counter == 2)) {
-        counter = 3;
-      }
-      else if (counter == 0) {
-        counter = 1;
-      }
-    }
-    else {
-      if ( (counter == 1) || (counter == 2)) {
-        counter = 0;
-      }
-      else if (counter == 3) {
-        counter = 2;
-      }
+      if ((counter == 1) || (counter == 2)) counter = 3;
+      else if (counter == 0)                counter = 1;
+    } else {
+      if ((counter == 1) || (counter == 2)) counter = 0;
+      else if (counter == 3)                counter = 2;
     }
     counters[pc/4] = counter;
   }

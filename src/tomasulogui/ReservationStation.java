@@ -52,10 +52,12 @@ public class ReservationStation {
   }
 
   public void snoop(CDB cdb) {
+    // If tag1 matches cdb data tag, grab the data
     if (tag1 == cdb.getDataTag() && cdb.getDataValid()) {
       data1 = cdb.getDataValue();
       data1Valid = true;
     }
+    // If tag2 matches cdb data tag, grab the data
     if (tag2 == cdb.getDataTag() && cdb.getDataValid()) {
       data2 = cdb.getDataValue();
       data2Valid = true;
@@ -67,6 +69,36 @@ public class ReservationStation {
   }
 
   public void loadInst(IssuedInst inst) {
-    // TODO add code to insert inst into reservation station
+    
+    // Set data values in reservation stations
+    this.tag1 = inst.getRegSrc1Tag();
+    this.tag2 = inst.getRegSrc2Tag();
+    this.data1 = inst.getRegSrc1Value();
+    this.data1Valid = inst.getRegSrc1Valid();
+    this.destTag = inst.getRegDestTag();
+    this.function = inst.getOpcode();
+
+    // Instructions with an immediate are a little different
+    switch (inst.getOpcode()) {
+      case ADDI:
+      case ANDI:
+      case ORI:
+      case XORI:
+      case SLL:
+      case SRA:
+      case SRL:
+      case STORE:
+        this.data2 = inst.getImmediate();
+        this.data2Valid = true;
+        break;
+      default:
+        this.data2 = inst.getRegSrc2Value();
+        this.data2Valid = inst.getRegSrc2Valid();
+        break;
+    }
+
+    // Handle Branching
+    this.address = inst.getBranchTgt();
+    this.predictedTaken = inst.getBranchPrediction();
   }
 }

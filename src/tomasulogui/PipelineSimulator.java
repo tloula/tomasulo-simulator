@@ -120,6 +120,11 @@ public class PipelineSimulator {
       return quietMode;
     }
 
+    private void automateSimulations() {
+      quietMode = true;
+      reset();
+    }
+
     private void simulate() {
 
       Command command = Command.UNUSED;
@@ -290,8 +295,6 @@ public class PipelineSimulator {
     }
 
     public void step() {
-
-      updateCDB();
       isHalted = reorder.retireInst();
 
       if (!isHalted) {
@@ -304,6 +307,8 @@ public class PipelineSimulator {
         alu.execCycle(cdb);
         branchUnit.execCycle(cdb);
         loader.execCycle(cdb);
+
+        cdb.updateCDB();
 
         // this updates PC, so no call from here for that
         issue.execCycle();
@@ -382,39 +387,6 @@ public class PipelineSimulator {
       cdb.squashAll();
     }
 
-    private boolean poll(FunctionalUnit fu) {
-      if (fu.getActivity() == FunctionalUnit.state.RAISING_HAND) {
-        cdb.setDataTag(fu.getResultTag());
-        cdb.setDataValue(fu.getResult());
-        cdb.setDataValid(true);
-
-        fu.setStateCDB();
-        return true;
-      }
-      return false;
-    }
-
-    public void updateCDB() {
-      // here, we need to poll the functional units and see if they want to
-      // writeback.  We pick longest running of those who want to use CDB and
-      // notify them they can write
-      cdb.setDataValid(false);
-
-      // hint: start with divider, and give it first chance of getting CDB
-      if (poll(this.divider)) return;
-      if (poll(this.multiplier)) return;
-
-      // Poll Load Unit
-      if (loader.isRequestingWriteback()) {
-        cdb.setDataTag(loader.getWriteTag());
-        cdb.setDataValue(loader.getWriteData());
-        cdb.setDataValid(true);
-        loader.setCanWriteback();
-        return;
-      }
-
-      if (poll(this.alu)) return;
-    }
 
     public static void main(String[] args) {
       PipelineSimulator sim = new PipelineSimulator();

@@ -15,7 +15,6 @@ public class RegisterFile {
   public int getReg(int regNum) {
     return regs[regNum];
   }
-
   public void setReg(int regNum, int regValue) {
     regs[regNum] = regValue;
   }
@@ -23,7 +22,6 @@ public class RegisterFile {
   public int getSlotForReg (int regNum) {
     return robSlot[regNum];
   }
-
   public void setSlotForReg (int regNum, int slot) {
     robSlot[regNum] = slot;
   }

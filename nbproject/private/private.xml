@@ -6,6 +6,8 @@
         <group>
             <file>file:/C:/Users/trevo/Documents/Repositories/dynamically-scheduled-processor-simulator/src/tomasulogui/BranchUnit.java</file>
             <file>file:/C:/Users/trevo/Documents/Repositories/dynamically-scheduled-processor-simulator/src/tomasulogui/ReorderBuffer.java</file>
+            <file>file:/C:/Users/trevo/Documents/Repositories/dynamically-scheduled-processor-simulator/src/tomasulogui/BranchPredictor.java</file>
+            <file>file:/C:/Users/trevo/Documents/Repositories/dynamically-scheduled-processor-simulator/src/tomasulogui/LoadBuffer.java</file>
             <file>file:/C:/Users/trevo/Documents/Repositories/dynamically-scheduled-processor-simulator/src/tomasulogui/IssueUnit.java</file>
         </group>
     </open-files>

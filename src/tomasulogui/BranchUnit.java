@@ -10,10 +10,12 @@ public class BranchUnit
     }
 
     public int calculateResult(int station) {
+        // Grab Parameters
         boolean taken = false;
         int param1 = this.stations[station].getData1();
         int param2 = this.stations[station].getData2();
 
+        // Calculate Result
         switch (this.stations[station].getFunction()) {
             case BEQ:
                 taken = param1 == param2;

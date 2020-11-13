@@ -1,7 +1,6 @@
 package tomasulogui;
 
-public class RTypeInst
-    extends Instruction {
+public class RTypeInst extends Instruction {
 
   int opcode;
   int rs;
@@ -14,15 +13,9 @@ public class RTypeInst
     opcode = -1;
   }
 
-//  public RTypeInst(String name) {
-//    super(name);
-//    opcode = getOpcode(name);
-//  }
-
   public int getOpcode() {
     return opcode;
   }
-
   public void setOpcode(int opc) {
     opcode = opc;
   }
@@ -30,7 +23,6 @@ public class RTypeInst
   public int getRS() {
     return rs;
   }
-
   public void setRS(int newRS) {
     rs = newRS;
   }
@@ -38,7 +30,6 @@ public class RTypeInst
   public int getRT() {
     return rt;
   }
-
   public void setRT(int newRT) {
     rt = newRT;
   }
@@ -46,7 +37,6 @@ public class RTypeInst
   public int getRD() {
     return rd;
   }
-
   public void setRD(int newRD) {
     rd = newRD;
   }
@@ -54,7 +44,6 @@ public class RTypeInst
   public int getShamt() {
     return shamt;
   }
-
   public void setShamt(int newShamt) {
     shamt = newShamt;
   }
@@ -66,8 +55,6 @@ public class RTypeInst
     newInst.rt = (oper >> 16) & 0x1f;
     newInst.rd = (oper >> 11) & 0x1f;
     newInst.shamt = (oper >> 6) & 0x1f;
-
     return (Instruction) newInst;
   }
-
 }

@@ -13,7 +13,6 @@ public class ProgramCounter {
   public int getPC () {
     return pc;
   }
-
   public void setPC (int newPC) {
     pc = newPC;
   }

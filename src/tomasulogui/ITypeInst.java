@@ -1,7 +1,6 @@
 package tomasulogui;
 
-public class ITypeInst
-    extends Instruction {
+public class ITypeInst extends Instruction {
 
   int opcode;
   int rs;
@@ -13,11 +12,6 @@ public class ITypeInst
     opcode = -1;
   }
 
-//  public ITypeInst(String name) {
-//    super(name);
-//    opcode = getOpcode(name);
-//  }
-
   public int getOpcode() {
     return opcode;
   }
@@ -25,7 +19,6 @@ public class ITypeInst
   public int getRS() {
     return rs;
   }
-
   public void setRS(int newRS) {
     rs = newRS;
   }
@@ -33,7 +26,6 @@ public class ITypeInst
   public int getRT() {
     return rt;
   }
-
   public void setRT(int newRT) {
     rt = newRT;
   }
@@ -41,7 +33,6 @@ public class ITypeInst
   public int getImmed() {
     return immed;
   }
-
   public void setImmed(int newImmed) {
     immed = newImmed;
   }
@@ -52,7 +43,6 @@ public class ITypeInst
     newInst.rs = (oper >> 21) & 0x1f;
     newInst.rt = (oper >> 16) & 0x1f;
     newInst.immed = oper & 0xffff;
-
     return (Instruction) newInst;
   }
 }

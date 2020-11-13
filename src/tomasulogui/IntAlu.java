@@ -7,14 +7,14 @@ public class IntAlu extends FunctionalUnit{
     super(sim);
   }
 
-
   public int calculateResult(int station) {
-    int result=0;
-
+    // Grab Operands
     IssuedInst.INST_TYPE inst = this.stations[station].getFunction();
     int leftOperand = this.stations[station].getData1();
     int rightOperand = this.stations[station].getData2();
+    int result=0;
 
+    // Perform operation
     switch (inst) {
       case ADD:
       case ADDI:
@@ -36,7 +36,7 @@ public class IntAlu extends FunctionalUnit{
         result = leftOperand ^ rightOperand;
         break;
       case SLL:
-        result = leftOperand << rightOperand; // Is this right??
+        result = leftOperand << rightOperand;
         break;
       case SRL:
         result = leftOperand >> rightOperand;

@@ -19,6 +19,7 @@ public abstract class FunctionalUnit {
     activity = state.INACTIVE;
     timeLeft = -1;
   }
+
   public void squashAll() {
     // Grab all units
     this.simulator.getALU().squash();
@@ -30,7 +31,6 @@ public abstract class FunctionalUnit {
   }
 
   public abstract int calculateResult(int station);
-
   public abstract int getExecCycles();
 
   public state getActivity() {
@@ -57,19 +57,22 @@ public abstract class FunctionalUnit {
   }
 
   public void execCycle(CDB cdb) {
-    //todo - start executing, ask for CDB, etc.
-
+    int otherSlot = (currentSlot + 1) % 2;
     if (stations[0] != null) stations[0].snoop(cdb);
     if (stations[1] != null) stations[1].snoop(cdb);
 
-    // if an instruction got put on the cdb, set the res station to null
-    if (activity == state.CDB){
+    // Handle if an instruction is executing
+    if (activity == state.EXECUTING)
+      timeLeft--;
+
+    // if an instruction got put on the cdb, set the reservation station to null
+    if (activity == state.CDB) {
       activity = state.INACTIVE;
       stations[currentSlot] = null;
       currentSlot = (currentSlot + 1) % 2;
     }
 
-    int otherSlot = (currentSlot + 1) % 2;
+    // If an instruction is not executing, try to start executing one (has both params?)
     if (activity == state.INACTIVE) { 
       if (this.stations[currentSlot] != null &&
           this.stations[currentSlot].getData1Valid() &&
@@ -87,13 +90,8 @@ public abstract class FunctionalUnit {
         timeLeft = this.getExecCycles();
       }
     }
-
-    if (activity == state.EXECUTING)
-      timeLeft--; // This makes sense
-
-    // if no one is executing, and if there are instructions to execute, pick one
-
-    // Execute an instruction if you can
+    
+    // If it's finished, raise hand
     if (timeLeft == 0) {
       timeLeft = -1;
       this.result = this.calculateResult(currentSlot);
@@ -102,42 +100,9 @@ public abstract class FunctionalUnit {
   }
 
   public void acceptIssue(IssuedInst inst) {
-    // todo - fill in reservation station (if available) with data from inst
-
+    // Figure out which slot is accepting the new instruction and set it's values 
     int slot = (stations[currentSlot] == null) ? currentSlot : (currentSlot + 1) % 2;
-
     this.stations[slot] = new ReservationStation(simulator);
-
-    this.stations[slot].tag1 = inst.getRegSrc1Tag();
-    this.stations[slot].tag2 = inst.getRegSrc2Tag();
-    this.stations[slot].data1 = inst.getRegSrc1Value();
-    this.stations[slot].data1Valid = inst.getRegSrc1Valid();
-    this.stations[slot].destTag = inst.getRegDestTag();
-    this.stations[slot].function = inst.getOpcode();
-
-    switch (inst.getOpcode()) {
-      case ADDI:
-      case ANDI:
-      case ORI:
-      case XORI:
-      case SLL:
-      case SRA:
-      case SRL:
-      case STORE:
-        this.stations[slot].data2 = inst.getImmediate();
-        this.stations[slot].data2Valid = true;
-        break;
-      default:
-        this.stations[slot].data2 = inst.getRegSrc2Value();
-        this.stations[slot].data2Valid = inst.getRegSrc2Valid();
-        break;
-    }
-
-    // Branch stuff
-    this.stations[slot].address = inst.getBranchTgt();
-    this.stations[slot].predictedTaken = inst.getBranchPrediction();
-    // Set later??
-    // int addressTag;
-    // boolean addressValid = false; 
+    this.stations[slot].loadInst(inst);
   }
 }

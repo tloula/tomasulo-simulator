@@ -5,7 +5,6 @@ public class LoadBuffer {
   PipelineSimulator simulator;
 
   LoadEntry[] buff = new LoadEntry[BUFFER_SIZE];
-//  boolean[] used = new boolean[BUFFER_SIZE];
 
   boolean requestWriteback = false;
   boolean canWriteback = false;
@@ -16,7 +15,6 @@ public class LoadBuffer {
 
   public LoadBuffer(PipelineSimulator sim) {
     simulator = sim;
-
   }
 
   public boolean isRequestingWriteback() {
@@ -46,12 +44,7 @@ public class LoadBuffer {
   }
 
   public void execCycle(CDB cdb) {
-    // first check if a reservation station was freed by writeback
-    
-
     if (canWriteback) {
-      //if(writebackEntry == -1) return; // I.e. previous instruction was squashed
-        
       buff[writebackEntry] = null;
       writebackEntry = -1;
       requestWriteback = false;
@@ -61,14 +54,12 @@ public class LoadBuffer {
     if (!requestWriteback) {
       if (loadExecuting) {
         // we are finished execution
-
         requestWriteback = true;
         int address = buff[writebackEntry].getAddress();
         writeData = simulator.getMemory().getIntDataAtAddr(address);
       }
-      // aren't executing inst
-      // because Branches might fall to here after completing (since don't
-      // writeback), we can't make this an else-if
+      // aren't executing inst because branches might fall to here after completing
+      // (since don't writeback), we can't make this an else-if
       else {
         for (int i = 0; i < BUFFER_SIZE; i++) {
           LoadEntry entry = buff[i];
@@ -77,13 +68,11 @@ public class LoadBuffer {
               writebackEntry = i;
               writeTag = entry.getDestTag();
               loadExecuting = true;
-
               break;
             }
           }
         }
       }
-
     }
     // check reservationStations for cdb data
     if (cdb.getDataValid()) {
@@ -93,33 +82,29 @@ public class LoadBuffer {
         }
       }
     }
-
     canWriteback = false;
   }
 
-  public boolean isReservationStationAvail() {
+  public boolean isFull() {
     for (int i=0; i < BUFFER_SIZE; i++) {
       if (buff[i] == null) {
-        return true;
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
   public void acceptIssue(IssuedInst inst) {
     int slot=0;
     for (slot=0; slot < BUFFER_SIZE; slot++) {
-     if (buff[slot] == null) {
-       break;
-     }
-   }
-   if (slot == BUFFER_SIZE) {
-     throw new MIPSException("Loader accept issue: slot not available");
-   }
+      if (buff[slot] == null) break;
+    }
 
-   LoadEntry entry = new LoadEntry();
-   buff[slot] = entry;
+    if (slot == BUFFER_SIZE)
+      throw new MIPSException("Loader accept issue: slot not available");
 
-   entry.loadInst (inst);
+    LoadEntry entry = new LoadEntry();
+    buff[slot] = entry;
+    entry.loadInst (inst);
   }
 }

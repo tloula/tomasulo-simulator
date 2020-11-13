@@ -62,14 +62,13 @@ public class IssuedInst {
       return this.regDestUsed;
     }
 
-    public int getRegDestTag() {
-      return regDestTag;
+    public int getImmediate() {
+      return immediate;
     }
 
     public int getPC() {
       return pc;
     }
-
     public void setPC(int newPC) {
       pc = newPC;
     }
@@ -77,7 +76,6 @@ public class IssuedInst {
     public boolean isBranch() {
       return branch;
     }
-
     public void setBranch() {
       branch = true;
     }
@@ -85,7 +83,6 @@ public class IssuedInst {
     public boolean getBranchPrediction() {
       return branchPredictTaken;
     }
-
     public void setBranchPrediction(boolean predict) {
       branchPredictTaken = predict;
     }
@@ -93,88 +90,76 @@ public class IssuedInst {
     public int getBranchTgt() {
       return branchTgt;
     }
-
     public void setBranchTgt(int tgt) {
       branchTgt = tgt;
     }
 
-    public int getImmediate() {
-      return immediate;
+    public int getRegDestTag() {
+      return regDestTag;
+    }
+    public void setRegDestTag(int tag) {
+      regDestTag = tag;
     }
 
     public boolean getRegSrc1Valid() {
       return regSrc1Valid;
     }
+    public void setRegSrc1Valid() {
+      regSrc1Valid = true;
+    }
 
     public boolean getRegSrc2Valid() {
       return regSrc2Valid;
+    }
+    public void setRegSrc2Valid() {
+      regSrc2Valid = true;
     }
 
     public int getRegSrc1Value() {
       return regSrc1Value;
     }
+    public void setRegSrc1Value(int val) {
+      regSrc1Value = val;
+    }
 
     public int getRegSrc2Value() {
       return regSrc2Value;
+    }
+    public void setRegSrc2Value(int val) {
+      regSrc2Value = val;
     }
 
     public int getRegSrc1Tag() {
       return regSrc1Tag;
     }
-
-    public int getRegSrc2Tag() {
-      return regSrc2Tag;
-    }
-
-    public void setRegSrc1Valid() {
-      regSrc1Valid = true;
-    }
-
-    public void setRegSrc2Valid() {
-      regSrc2Valid = true;
-    }
-
-    public void setRegSrc1Value(int val) {
-      regSrc1Value = val;
-    }
-
-    public void setRegSrc2Value(int val) {
-      regSrc2Value = val;
-    }
-
     public void setRegSrc1Tag(int tag) {
       regSrc1Tag = tag;
     }
 
+    public int getRegSrc2Tag() {
+      return regSrc2Tag;
+    }
     public void setRegSrc2Tag(int tag) {
       regSrc2Tag = tag;
     }
 
-    public void setRegDestTag(int tag) {
-      regDestTag = tag;
-    }
-
     public static IssuedInst createIssuedInst(Instruction inst) {
       IssuedInst issued = new IssuedInst();
-
       issued.opcode = issued.getOpcode(inst.getOpcode());
       issued.branch = issued.determineIfBranch();
 
-      if (inst instanceof ITypeInst) {
+      if (inst instanceof ITypeInst)
         issued.decodeIType( (ITypeInst) inst);
-      }
-      else if (inst instanceof JTypeInst) {
+      else if (inst instanceof JTypeInst)
         issued.decodeJType( (JTypeInst) inst);
-      }
-      else if (inst instanceof RTypeInst) {
+      else if (inst instanceof RTypeInst)
         issued.decodeRType( (RTypeInst) inst);
-      }
 
       return issued;
     }
 
     public boolean determineIfBranch() {
-      if (opcode == INST_TYPE.BEQ ||
+      return (opcode == INST_TYPE.BEQ ||
           opcode == INST_TYPE.BNE ||
           opcode == INST_TYPE.BLTZ ||
           opcode == INST_TYPE.BLEZ ||
@@ -183,13 +168,7 @@ public class IssuedInst {
           opcode == INST_TYPE.J ||
           opcode == INST_TYPE.JAL ||
           opcode == INST_TYPE.JR ||
-          opcode == INST_TYPE.JALR) {
-        return true;
-      }
-      else {
-        return false;
-      }
-
+          opcode == INST_TYPE.JALR);
     }
 
     private INST_TYPE getOpcode(int type) {
@@ -290,15 +269,11 @@ public class IssuedInst {
       regSrc1Used = true;
       regSrc1 = inst.getRS();
 	  
-	  if(inst.opcode != Instruction.INST_SLL && inst.opcode != Instruction.INST_SRA && inst.opcode != Instruction.INST_SRL)
-      {
-          regSrc2Used = true;
-          regSrc2 = inst.getRT();
-      }
-      else
-      {
+      if(inst.opcode != Instruction.INST_SLL && inst.opcode != Instruction.INST_SRA && inst.opcode != Instruction.INST_SRL) {
+        regSrc2Used = true;
+        regSrc2 = inst.getRT();
+      } else {
         immediate = inst.getShamt();
       }
     }
-
   }

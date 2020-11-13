@@ -15,84 +15,41 @@ public class IssueUnit {
 
     public void execCycle() {
       // an execution cycle involves:
-      // 1. check if ROB and Reservation Station have available slots
-      if(this.simulator.getROB().isFull()){
-        return;
-      } else {
-        // Get instruction from memory
-        issuee = IssuedInst.createIssuedInst(this.simulator.getMemory().getInstAtAddr(this.simulator.getPC()));
-        issuee.setPC(this.simulator.getPC());
+      // check if ROB and Reservation Station have available slots
+      if (this.simulator.getROB().isFull()) return;
 
-        // Issue it to the proper FU based on the type IFF it has an available slot
+      // Get instruction from memory
+      issuee = IssuedInst.createIssuedInst(this.simulator.getMemory().getInstAtAddr(this.simulator.getPC()));
+      issuee.setPC(this.simulator.getPC());
 
-        IssuedInst.INST_TYPE opcode = issuee.getOpcode();
+      // Issue it to the proper FU based on the type IFF it has an available slot
+      IssuedInst.INST_TYPE opcode = issuee.getOpcode();
 
-        if (opcode == IssuedInst.INST_TYPE.DIV) {
-          if(this.simulator.getDivider().isFull()){
-            return;
-          }
-          this.instType = EXEC_TYPE.DIV;
-        } else if (opcode == IssuedInst.INST_TYPE.MUL) {
-          if(this.simulator.getMult().isFull()){
-            return;
-          }
-          this.instType = EXEC_TYPE.MULT;
-        } else if (opcode == IssuedInst.INST_TYPE.LOAD) {
-          // TODO: Take into account that we don't check if load buffer is full???
-          //if(this.simulator.loader.isFull()){
-          //  return;
-          //}
-          this.instType = EXEC_TYPE.LOAD;
-        } else if  (opcode == IssuedInst.INST_TYPE.BEQ || 
-                    opcode == IssuedInst.INST_TYPE.BNE || 
-                    opcode == IssuedInst.INST_TYPE.BLTZ || 
-                    opcode == IssuedInst.INST_TYPE.BLEZ || 
-                    opcode == IssuedInst.INST_TYPE.BGEZ || 
-                    opcode == IssuedInst.INST_TYPE.BGTZ || 
-                    opcode == IssuedInst.INST_TYPE.JAL || 
-                    opcode == IssuedInst.INST_TYPE.JR || 
-                    opcode == IssuedInst.INST_TYPE.JALR || 
-                    opcode == IssuedInst.INST_TYPE.J) {
-          if(this.simulator.getBranchUnit().isFull()){
-            return;
-          }
-          this.instType = EXEC_TYPE.BRANCH; 
-        } else if ( opcode == IssuedInst.INST_TYPE.NOP ||
-                    opcode == IssuedInst.INST_TYPE.HALT || 
-                    opcode == IssuedInst.INST_TYPE.STORE) {
-          this.instType = EXEC_TYPE.NONE;
-        } else { // ALU OPS           
-          if(this.simulator.getALU().isFull()){
-            return;
-          }
-          this.instType = EXEC_TYPE.ALU; 
-        }
+      if (opcode == IssuedInst.INST_TYPE.DIV) {
+        if(this.simulator.getDivider().isFull()) return;
+        this.instType = EXEC_TYPE.DIV;
+      } else if (opcode == IssuedInst.INST_TYPE.MUL) {
+        if(this.simulator.getMult().isFull()) return;
+        this.instType = EXEC_TYPE.MULT;
+      } else if (opcode == IssuedInst.INST_TYPE.LOAD) {
+        if (this.simulator.loader.isFull()) return;
+        this.instType = EXEC_TYPE.LOAD;
+      } else if (issuee.isBranch()) {
+        if (this.simulator.getBranchUnit().isFull()) return;
+        this.instType = EXEC_TYPE.BRANCH; 
+      } else if ( opcode == IssuedInst.INST_TYPE.NOP ||
+                  opcode == IssuedInst.INST_TYPE.HALT || 
+                  opcode == IssuedInst.INST_TYPE.STORE) {
+        this.instType = EXEC_TYPE.NONE;
+      } else { // ALU OPS           
+        if (this.simulator.getALU().isFull()) return;
+        this.instType = EXEC_TYPE.ALU; 
       }
 
-      // 2. issuing to reservation station, if no structural hazard
-      // to issue, we make an IssuedInst, filling in what we know
-      // We check the BTB, and put prediction if branch, updating PC
-      //     if pred taken, incr PC otherwise
-
-      // We then send this to the ROB, which fills in the data fields
+      // We send this to the ROB, which fills in the data fields
       this.simulator.getROB().updateInstForIssue(issuee);
 
-      // We then check the CDB, and see if it is broadcasting data we need,
-      //    so that we can forward during issue
-
-      // TODO: If we move the CDB back, this will be necessary again
-      // Also, we will need to check CDB for Store values, not just register values
-      // if (this.simulator.getCDB().getDataValid()){
-      //   if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc1Tag()) {
-      //     issuee.setRegSrc1Valid();
-      //     issuee.setRegSrc1Value(this.simulator.getCDB().getDataValue());
-      //   } else if (this.simulator.getCDB().getDataTag() == issuee.getRegSrc2Tag()){
-      //     issuee.setRegSrc2Valid();
-      //     issuee.setRegSrc2Value(this.simulator.getCDB().getDataValue());
-      //   }
-      // }
-
-      // We then send this to the FU, who stores in reservation station
+      // We then send this to the correct reservation station
       if (instType == EXEC_TYPE.ALU){
         this.simulator.getALU().acceptIssue(issuee);
       } else if (instType == EXEC_TYPE.BRANCH){
@@ -101,12 +58,8 @@ public class IssueUnit {
         this.simulator.getMult().acceptIssue(issuee);
       } else if (instType == EXEC_TYPE.DIV){
         this.simulator.getDivider().acceptIssue(issuee);
-      } else if (instType == EXEC_TYPE.NONE){
-        // TODO: What about wack instructions like NOP and HALT?
       } else if (instType == EXEC_TYPE.LOAD) {
         this.simulator.getLoader().acceptIssue(issuee);
-      } else {
-        System.out.println("How did you...what? ....How did you get here?");
       }
     }
   }

@@ -4,10 +4,15 @@ Why are there registers in both the pipeline simulator and the reorder buffer???
 
 TODO: -----------------------------------------------------------------
 
-fix the whole 2 different "isBranch()" functions thing
+Finished
+    FunctionalUnit
+    ROBEntry
+    Reservation station
+    IssueUnit
+    Other units (ALU, div, mul, branch)
+    BranchPredictor
+    CDB
 
-
-Do we handle the num of retirees correctly?
 
 Writeup: --------------------------------------------------------------
 

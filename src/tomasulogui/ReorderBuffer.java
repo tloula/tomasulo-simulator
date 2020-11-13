@@ -76,15 +76,11 @@ public class ReorderBuffer {
     }
     
     if (retiree.getOpcode() == INST_TYPE.STORE ||
-        retiree.getOpcode() == INST_TYPE.NOP) {
+        retiree.getOpcode() == INST_TYPE.NOP)
       retiree.setComplete();
-    }
 
     boolean shouldAdvance = true;
     boolean squashed = false;
-
-    // TODO - this is where you look at the type of instruction and
-    // figure out how to retire it properly
 
     if (!retiree.isComplete()) {
       shouldAdvance = false; 
@@ -93,7 +89,7 @@ public class ReorderBuffer {
       // If is branch
       if(retiree.isBranch()){
         if(retiree.branchMispredicted()){
-          // Handle mispredicted branch (update pc, squash?)
+          // Handle mispredicted branch
           if (  retiree.getOpcode() == INST_TYPE.JR || // JR type always mispredict for convenience
                 retiree.getOpcode() ==INST_TYPE.JALR) {
             this.simulator.setPC(retiree.getWriteValue() + 4);
@@ -108,7 +104,6 @@ public class ReorderBuffer {
               retiree.getOpcode() ==INST_TYPE.JALR){
           regs.setReg(31, retiree.getInstPC());
         }
-
         this.simulator.getBTB().setBranchResult(retiree.getInstPC(), retiree.getPredictTaken() ^ retiree.branchMispredicted());
       }
       // else if is store
@@ -117,7 +112,7 @@ public class ReorderBuffer {
           retiree.setStoreData(simulator.getROB().getDataForReg(31));
         simulator.getMemory().setIntDataAtAddr(retiree.getStoreAddress() + retiree.getOffset(), retiree.getStoreData());
       }
-      // else if is alu/mul/div/nop/load, I think?
+      // else if is alu/mul/div/nop/load
       else {
         if(retiree.getWriteReg() != -1) regs.setReg(retiree.getWriteReg(), retiree.getWriteValue());
       }
@@ -140,7 +135,7 @@ public class ReorderBuffer {
         return false; // Might not need this eventually, for now, it avoids the readCDB line
       }
     }
-    
+
     // Can we move this?
     readCDB(simulator.getCDB());
 
@@ -202,5 +197,4 @@ public class ReorderBuffer {
   public void setTagForReg(int regNum, int tag) {
     regs.setSlotForReg(regNum, tag);
   }
-
 }

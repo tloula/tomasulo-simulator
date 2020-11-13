@@ -9,11 +9,6 @@ public class JTypeInst extends Instruction {
     opcode = -1;
   }
 
-//  public JTypeInst (String name) {
-//    super(name);
-//    opcode = getOpcode(name);
-//  }
-
   public int getOpcode() {
     return opcode;
   }
@@ -21,7 +16,6 @@ public class JTypeInst extends Instruction {
   public int getOffset() {
     return offset;
   }
-
   public void setOffset(int newOff) {
     offset = newOff;
   }
@@ -30,7 +24,7 @@ public class JTypeInst extends Instruction {
     JTypeInst newInst = new JTypeInst();
     newInst.opcode = opcode;
     newInst.offset = oper & 0x03ffffff;
-	newInst.offset = (newInst.offset << 6) >> 6;
+	  newInst.offset = (newInst.offset << 6) >> 6;
     return (Instruction) newInst;
   }
 }
