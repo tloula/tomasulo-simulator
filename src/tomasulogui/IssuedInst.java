@@ -158,6 +158,7 @@ public class IssuedInst {
       IssuedInst issued = new IssuedInst();
 
       issued.opcode = issued.getOpcode(inst.getOpcode());
+      issued.branch = issued.determineIfBranch();
 
       if (inst instanceof ITypeInst) {
         issued.decodeIType( (ITypeInst) inst);

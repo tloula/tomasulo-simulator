@@ -36,6 +36,10 @@ public class BranchUnit
             case JR:
             case JALR:
                 this.simulator.getROB().getEntryByTag(this.stations[station].getDestTag()).setWriteValue(param1);
+            case J:
+            case JAL:
+                taken = true;
+                break;
             default:
                 System.out.println("Branch Unit Passed Invalid Branch Type: " + this.stations[station].getFunction());
                 break;

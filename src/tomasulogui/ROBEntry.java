@@ -238,6 +238,7 @@ public class ROBEntry {
     // Fill in branch prediction
     this.rob.getSimulator().getBTB().predictBranch(inst);
     this.target = inst.getBranchTgt();
+    this.predictTaken = inst.getBranchPrediction();
 
     // Update ROB entry fields. 
     this.writeReg = inst.getRegDest();

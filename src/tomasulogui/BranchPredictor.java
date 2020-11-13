@@ -25,41 +25,30 @@ public class BranchPredictor {
 
     boolean predictTaken = false;
 
-    if(issued.isBranch()){
+    if(!issued.determineIfBranch()){
+      simulator.setPC(issued.getPC() + 4);
       return;
     }
 
     if (issued.getOpcode() == IssuedInst.INST_TYPE.J ||
-        issued.getOpcode() == IssuedInst.INST_TYPE.JR ||
-        issued.getOpcode() == IssuedInst.INST_TYPE.JAL ||
-        issued.getOpcode() == IssuedInst.INST_TYPE.JALR) {
+        issued.getOpcode() == IssuedInst.INST_TYPE.JAL) {
       predictTaken = true;
     }
     else {
-      if (counters[pcOffset] > 1 && tgt[pcOffset] != -1) { // Changed tgt[pcOffset] comparison to -1 (from 1)
+      if (counters[pcOffset] > 1) { // Changed tgt[pcOffset] comparison to -1 (from 1)
         predictTaken = true;
       }
     }
     issued.setBranchPrediction(predictTaken);
-
+    // if(predictTaken){
+    //   issued.setBranch();
+    // }
     int tgtAddress = -1;
 
     // now tgt
-    if (issued.getOpcode() == IssuedInst.INST_TYPE.J ||
-        issued.getOpcode() == IssuedInst.INST_TYPE.JAL) {
-      tgtAddress = issued.getPC() + 4 + issued.getImmediate();
-    }
-    else if (issued.getOpcode() == IssuedInst.INST_TYPE.JR ||
-             issued.getOpcode() == IssuedInst.INST_TYPE.JALR) {
-      if (tgt[pcOffset] != -1) {
-        tgtAddress = tgt[pcOffset];
-      }
-      else {
-        tgtAddress = issued.getPC() + 4;
-      }
-    }
-    else if (tgt[pcOffset] != -1) {
-      tgtAddress = tgt[pcOffset];
+    if (issued.getOpcode() == IssuedInst.INST_TYPE.JR ||
+        issued.getOpcode() == IssuedInst.INST_TYPE.JALR) {
+      tgtAddress = issued.getPC() + 4;
     }
     else {
       tgtAddress = issued.getPC() + 4 + issued.getImmediate();

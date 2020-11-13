@@ -94,8 +94,13 @@ public class ReorderBuffer {
       if(retiree.isBranch()){
         if(retiree.branchMispredicted()){
           // Handle mispredicted branch (update pc, squash?)
-          int newPC = retiree.getPredictTaken() ? retiree.getInstPC() + 4 : retiree.getTarget();
-          this.simulator.setPC(newPC);
+          if (  retiree.getOpcode() == INST_TYPE.JR || // JR type always mispredict for convenience
+                retiree.getOpcode() ==INST_TYPE.JALR) {
+            this.simulator.setPC(retiree.getWriteValue() + 4);
+          } else {
+            int newPC = retiree.getPredictTaken() ? retiree.getInstPC() + 4 : retiree.getTarget();
+            this.simulator.setPC(newPC);
+          }
           this.simulator.getALU().squashAll();
           squashed = true;
         }
@@ -103,24 +108,17 @@ public class ReorderBuffer {
               retiree.getOpcode() ==INST_TYPE.JALR){
           regs.setReg(31, retiree.getInstPC());
         }
-        if (  retiree.getOpcode() == INST_TYPE.JR ||
-              retiree.getOpcode() ==INST_TYPE.JALR) {
-          this.simulator.setPC(retiree.getWriteValue() + 4);
-          this.simulator.getALU().squashAll();
-          squashed = true;
-        }
 
         this.simulator.getBTB().setBranchResult(retiree.getInstPC(), retiree.getPredictTaken() ^ retiree.branchMispredicted());
-        //this.simulator.getBTB().setBranchAddress(retiree.getInstPC(), simulator.getPC());
       }
       // else if is store
       if (retiree.getOpcode() == IssuedInst.INST_TYPE.STORE) {
         if(retiree.getStoreDataTag() == 31)
           retiree.setStoreData(simulator.getROB().getDataForReg(31));
         simulator.getMemory().setIntDataAtAddr(retiree.getStoreAddress() + retiree.getOffset(), retiree.getStoreData());
-      } 
+      }
       // else if is alu/mul/div/nop/load, I think?
-      else { 
+      else {
         if(retiree.getWriteReg() != -1) regs.setReg(retiree.getWriteReg(), retiree.getWriteValue());
       }
 
