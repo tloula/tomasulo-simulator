@@ -120,11 +120,6 @@ public class PipelineSimulator {
       return quietMode;
     }
 
-    private void automateSimulations() {
-      quietMode = true;
-      reset();
-    }
-
     private void simulate() {
 
       Command command = Command.UNUSED;
