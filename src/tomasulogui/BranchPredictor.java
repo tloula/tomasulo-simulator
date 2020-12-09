@@ -14,7 +14,7 @@ public class BranchPredictor {
     }
   }
 
-  public void predictBranch(IssuedInst issued) {
+  public void predictBranch(IssuedInst issued) {      
     int pcOffset = issued.getPC() / 4;
     boolean predictTaken = false;
     int tgtAddress = -1;
